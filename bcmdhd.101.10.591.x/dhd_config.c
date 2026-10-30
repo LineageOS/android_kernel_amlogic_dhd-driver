@@ -4,6 +4,7 @@
 
 #include <bcmendian.h>
 #include <bcmutils.h>
+#include <bcmdevs_legacy.h>
 #include <hndsoc.h>
 #include <bcmsdbus.h>
 #if defined(HW_OOB) || defined(FORCE_WOWLAN)
@@ -92,29 +93,69 @@ typedef struct eventmsg_buf {
 typedef struct chip_name_map_t {
 	uint chip;
 	uint chiprev;
+	uint ag_type;
 	char *chip_name;
 	char *module_name;
 } chip_name_map_t;
 
+/* Legacy chips can have separate 2.4 GHz and dual-band firmware images. */
+enum {
+	FW_BAND_ANY,
+	FW_BAND_G,
+	FW_BAND_AG,
+};
+
 const chip_name_map_t chip_name_map[] = {
-	/* ChipID			Chiprev	ChipName		ModuleName  */
+	/* ChipID, Chiprev, Band, ChipName, ModuleName */
 #ifdef BCMSDIO
-	{BCM43430_CHIP_ID,	0,	"bcm43438a0",		"ap6212"},
-	{BCM43430_CHIP_ID,	1,	"bcm43438a1",		"ap6212a"},
-	{BCM43430_CHIP_ID,	2,	"bcm43436b0",		"ap6236"},
-	{BCM43012_CHIP_ID,	2,	"bcm43013c1_ag",	""},
-	{BCM4345_CHIP_ID,	6,	"bcm43455c0_ag",	"ap6255"},
-	{BCM4345_CHIP_ID,	9,	"bcm43456c5_ag",	"ap6256"},
-	{BCM4359_CHIP_ID,	9,	"bcm4359c0_ag",		"ap6398s"},
-	{BCM43752_CHIP_ID,	2,	"bcm43752a2_ag",	"ap6275s"},
+	{BCM43362_CHIP_ID, 0, FW_BAND_ANY, "bcm40181a0", ""},
+	{BCM43362_CHIP_ID, 1, FW_BAND_ANY, "bcm40181a2", ""},
+	{BCM4330_CHIP_ID, 4, FW_BAND_G, "bcm40183b2", ""},
+	{BCM4330_CHIP_ID, 4, FW_BAND_AG, "bcm40183b2_ag", ""},
+	{BCM43430_CHIP_ID, 0, FW_BAND_ANY, "bcm43438a0", "ap6212"},
+	{BCM43430_CHIP_ID, 1, FW_BAND_ANY, "bcm43438a1", "ap6212a"},
+	{BCM43430_CHIP_ID, 2, FW_BAND_ANY, "bcm43436b0", "ap6236"},
+	{BCM43012_CHIP_ID, 1, FW_BAND_G, "bcm43013b0", ""},
+	{BCM43012_CHIP_ID, 1, FW_BAND_AG, "bcm43013c0_ag", ""},
+	{BCM43012_CHIP_ID, 2, FW_BAND_ANY, "bcm43013c1_ag", ""},
+	{BCM4334_CHIP_ID, 3, FW_BAND_ANY, "bcm4334b1_ag", ""},
+	{BCM43340_CHIP_ID, 2, FW_BAND_ANY, "bcm43341b0_ag", ""},
+	{BCM43341_CHIP_ID, 2, FW_BAND_ANY, "bcm43341b0_ag", ""},
+	{BCM4324_CHIP_ID, 5, FW_BAND_ANY, "bcm43241b4_ag", ""},
+	{BCM4335_CHIP_ID, 2, FW_BAND_ANY, "bcm4339a0_ag", ""},
+	{BCM4339_CHIP_ID, 1, FW_BAND_ANY, "bcm4339a0_ag", "ap6335"},
+	{BCM4345_CHIP_ID, 6, FW_BAND_ANY, "bcm43455c0_ag", "ap6255"},
+	{BCM43454_CHIP_ID, 6, FW_BAND_ANY, "bcm43455c0_ag", ""},
+	{BCM4345_CHIP_ID, 9, FW_BAND_ANY, "bcm43456c5_ag", "ap6256"},
+	{BCM43454_CHIP_ID, 9, FW_BAND_ANY, "bcm43456c5_ag", ""},
+	{BCM4354_CHIP_ID, 1, FW_BAND_ANY, "bcm4354a1_ag", ""},
+	{BCM4354_CHIP_ID, 2, FW_BAND_ANY, "bcm4356a2_ag", "ap6356"},
+	{BCM4356_CHIP_ID, 2, FW_BAND_ANY, "bcm4356a2_ag", "ap6356"},
+	{BCM4371_CHIP_ID, 2, FW_BAND_ANY, "bcm4356a2_ag", ""},
+	{BCM43569_CHIP_ID, 3, FW_BAND_ANY, "bcm4358a3_ag", ""},
+	{BCM4359_CHIP_ID, 5, FW_BAND_ANY, "bcm4359b1_ag", ""},
+	{BCM4359_CHIP_ID, 9, FW_BAND_ANY, "bcm4359c0_ag", "ap6398s"},
+	{BCM4362_CHIP_ID, 0, FW_BAND_ANY, "bcm43752a0_ag", ""},
+	{BCM43751_CHIP_ID, 1, FW_BAND_ANY, "bcm43751a1_ag", ""},
+	{BCM43751_CHIP_ID, 2, FW_BAND_ANY, "bcm43751a2_ag", ""},
+	{BCM43752_CHIP_ID, 1, FW_BAND_ANY, "bcm43752a1_ag", ""},
+	{BCM43752_CHIP_ID, 2, FW_BAND_ANY, "bcm43752a2_ag", "ap6275s"},
 #endif
 #ifdef BCMPCIE
-	{BCM4359_CHIP_ID,	9,	"bcm4359c0_pcie_ag",	""},
-	{BCM43752_CHIP_ID,	2,	"bcm43752a2_pcie_ag",	""},
-	{BCM4375_CHIP_ID,	5,	"bcm4375b4_pcie_ag",	"ap6275hh3"},
+	{BCM4354_CHIP_ID, 2, FW_BAND_ANY, "bcm4356a2_pcie_ag", ""},
+	{BCM4356_CHIP_ID, 2, FW_BAND_ANY, "bcm4356a2_pcie_ag", ""},
+	{BCM4359_CHIP_ID, 9, FW_BAND_ANY, "bcm4359c0_pcie_ag", ""},
+	{BCM4362_CHIP_ID, 0, FW_BAND_ANY, "bcm43752a0_pcie_ag", ""},
+	{BCM43751_CHIP_ID, 1, FW_BAND_ANY, "bcm43751a1_pcie_ag", ""},
+	{BCM43751_CHIP_ID, 2, FW_BAND_ANY, "bcm43751a2_pcie_ag", ""},
+	{BCM43752_CHIP_ID, 1, FW_BAND_ANY, "bcm43752a1_pcie_ag", ""},
+	{BCM43752_CHIP_ID, 2, FW_BAND_ANY, "bcm43752a2_pcie_ag", ""},
+	{BCM4375_CHIP_ID, 5, FW_BAND_ANY, "bcm4375b4_pcie_ag", "ap6275hh3"},
 #endif
 #ifdef BCMDBUS
-	{BCM43569_CHIP_ID,	2,	"bcm4358u_ag",		"ap62x8"},
+	{BCM43143_CHIP_ID, 2, FW_BAND_ANY, "bcm43143b0", ""},
+	{BCM43242_CHIP_ID, 1, FW_BAND_ANY, "bcm43242a1_ag", ""},
+	{BCM43569_CHIP_ID, 2, FW_BAND_ANY, "bcm4358u_ag", "ap62x8"},
 #endif
 };
 
@@ -600,7 +641,7 @@ dhd_conf_free_mchan_list(struct dhd_conf *conf)
 }
 
 const chip_name_map_t*
-dhd_conf_match_chip(dhd_pub_t *dhd)
+dhd_conf_match_chip(dhd_pub_t *dhd, uint ag_type)
 {
 	uint chip, chiprev;
 	int i;
@@ -610,7 +651,9 @@ dhd_conf_match_chip(dhd_pub_t *dhd)
 
 	for (i=0; i<sizeof(chip_name_map)/sizeof(chip_name_map[0]); i++) {
 		const chip_name_map_t *row = &chip_name_map[i];
-		if (row->chip == chip && row->chiprev == chiprev) {
+		if (row->chip == chip && row->chiprev == chiprev &&
+				(row->ag_type == ag_type || ag_type == FW_BAND_ANY ||
+				row->ag_type == FW_BAND_ANY)) {
 			return row;
 		}
 	}
@@ -703,7 +746,7 @@ dhd_conf_match_module(dhd_pub_t *dhd)
 #endif
 
 char *
-dhd_conf_get_chip_name(dhd_pub_t *dhd, bool *chip_map_v2)
+dhd_conf_get_chip_name(dhd_pub_t *dhd, uint ag_type, bool *chip_map_v2)
 {
 #ifdef UPDATE_MODULE_NAME
 	const module_name_map_t *row_module = NULL;
@@ -720,7 +763,7 @@ dhd_conf_get_chip_name(dhd_pub_t *dhd, bool *chip_map_v2)
 	} else
 #endif
 	{
-		row_chip = dhd_conf_match_chip(dhd);
+		row_chip = dhd_conf_match_chip(dhd, ag_type);
 		if (row_chip && strlen(row_chip->chip_name)) {
 			name = row_chip->chip_name;
 		}
@@ -753,7 +796,7 @@ dhd_conf_get_module_name(dhd_pub_t *dhd)
 	} else
 #endif
 	{
-		row_chip = dhd_conf_match_chip(dhd);
+		row_chip = dhd_conf_match_chip(dhd, FW_BAND_ANY);
 		if (row_chip && strlen(row_chip->module_name)) {
 			name = row_chip->module_name;
 		}
@@ -768,10 +811,11 @@ dhd_conf_get_module_name(dhd_pub_t *dhd)
 	return name;
 }
 
-void
+uint
 dhd_conf_set_fw_name_by_chip(dhd_pub_t *dhd, char *fw_path)
 {
 	int fw_type;
+	uint ag_type = FW_BAND_ANY;
 	char *name_ptr, *chip_name = NULL;
 	bool chip_map_v2;
 	int i;
@@ -783,11 +827,11 @@ dhd_conf_set_fw_name_by_chip(dhd_pub_t *dhd, char *fw_path)
 #endif
 		{
 			CONFIG_MSG("firmware path is null\n");
-			return;
+			return ag_type;
 		}
 	}
 #ifndef FW_PATH_AUTO_SELECT
-	return;
+	return ag_type;
 #endif
 
 	/* find out the last '/' */
@@ -800,6 +844,11 @@ dhd_conf_set_fw_name_by_chip(dhd_pub_t *dhd, char *fw_path)
 		i--;
 	}
 	name_ptr = &fw_path[i];
+#ifdef BAND_AG
+	ag_type = FW_BAND_AG;
+#else
+	ag_type = strstr(name_ptr, "_ag") ? FW_BAND_AG : FW_BAND_G;
+#endif
 	if (strstr(name_ptr, "_apsta"))
 		fw_type = FW_TYPE_APSTA;
 	else if (strstr(name_ptr, "_p2p"))
@@ -821,7 +870,7 @@ dhd_conf_set_fw_name_by_chip(dhd_pub_t *dhd, char *fw_path)
 		fw_type = FW_TYPE_EZMESH;
 #endif /* WLEASYMESH */
 
-	chip_name = dhd_conf_get_chip_name(dhd, &chip_map_v2);
+	chip_name = dhd_conf_get_chip_name(dhd, ag_type, &chip_map_v2);
 	if (chip_name) {
 		strcpy(name_ptr, "fw_");
 		strcat(name_ptr, chip_name);
@@ -865,10 +914,11 @@ dhd_conf_set_fw_name_by_chip(dhd_pub_t *dhd, char *fw_path)
 #endif
 
 	CONFIG_TRACE("firmware_path=%s\n", fw_path);
+	return ag_type;
 }
 
 void
-dhd_conf_set_clm_name_by_chip(dhd_pub_t *dhd, char *clm_path)
+dhd_conf_set_clm_name_by_chip(dhd_pub_t *dhd, char *clm_path, uint ag_type)
 {
 	char *name_ptr, *chip_name = NULL;
 	bool chip_map_v2;
@@ -893,7 +943,7 @@ dhd_conf_set_clm_name_by_chip(dhd_pub_t *dhd, char *clm_path)
 	}
 	name_ptr = &clm_path[i];
 
-	chip_name = dhd_conf_get_chip_name(dhd, &chip_map_v2);
+	chip_name = dhd_conf_get_chip_name(dhd, ag_type, &chip_map_v2);
 	if (chip_name) {
 		strcpy(name_ptr, "clm_");
 		strcat(name_ptr, chip_name);
@@ -1038,7 +1088,7 @@ dhd_conf_set_conf_name_by_chip(dhd_pub_t *dhd, char *conf_path)
 	}
 	name_ptr = &conf_path[i];
 
-	chip_name = dhd_conf_get_chip_name(dhd, &chip_map_v2);
+	chip_name = dhd_conf_get_chip_name(dhd, FW_BAND_ANY, &chip_map_v2);
 	if (chip_name) {
 		strcpy(name_ptr, "config_");
 		strcat(name_ptr, chip_name);
@@ -1217,6 +1267,8 @@ dhd_conf_add_filepath(dhd_pub_t *dhd, char *pFilename)
 void
 dhd_conf_set_path_params(dhd_pub_t *dhd, char *fw_path, char *nv_path)
 {
+	uint ag_type;
+
 	/* External conf takes precedence if specified */
 	dhd_conf_preinit(dhd);
 
@@ -1238,9 +1290,9 @@ dhd_conf_set_path_params(dhd_pub_t *dhd, char *fw_path, char *nv_path)
 	dhd_conf_set_conf_name_by_chip(dhd, dhd->conf_path);
 #endif
 
-	dhd_conf_set_fw_name_by_chip(dhd, fw_path);
+	ag_type = dhd_conf_set_fw_name_by_chip(dhd, fw_path);
 	dhd_conf_set_nv_name_by_chip(dhd, nv_path);
-	dhd_conf_set_clm_name_by_chip(dhd, dhd->clm_path);
+	dhd_conf_set_clm_name_by_chip(dhd, dhd->clm_path, ag_type);
 #ifdef SET_FWNV_BY_MAC
 	dhd_conf_set_fw_name_by_mac(dhd, fw_path);
 	dhd_conf_set_nv_name_by_mac(dhd, nv_path);

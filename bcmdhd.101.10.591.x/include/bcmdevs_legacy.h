@@ -43,6 +43,16 @@
 #ifndef	_bcmdevs_legacy_h_
 #define	_bcmdevs_legacy_h_
 
+/* Legacy firmware auto-selection chip IDs retained from the 361 driver. */
+#define BCM43143_CHIP_ID	43143
+#define BCM43242_CHIP_ID	43242
+#define BCM43362_CHIP_ID	43362
+#define BCM4330_CHIP_ID	0x4330
+#define BCM4324_CHIP_ID	0x4324
+#define BCM4334_CHIP_ID	0x4334
+#define BCM43340_CHIP_ID	43340
+#define BCM43341_CHIP_ID	43341
+
 /* DONGLE VID/PIDs */
 #define BCM_DNGL_BL_PID_43569   0xbd27
 
